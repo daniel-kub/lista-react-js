@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { useState } from "react";
+import { Product } from "./Product";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [shoppingList, setShoppingList] = useState([]);
+  const [newProduct, setNewProduct] = useState("");
+
+  const handleChange = (event) => {
+    setNewProduct(event.target.value);
+  };
+
+  const addProduct = () => {
+    if (newProduct.trim() === "") return;
+    const product = {
+      id: shoppingList.length === 0 ? 1 : shoppingList[shoppingList.length - 1].id + 1,
+      productName: newProduct,
+      bought: false,
+    };
+    setShoppingList([...shoppingList, product]);
+    setNewProduct(""); // czyści input
+  };
+
+  const deleteProduct = (id) => {
+    setShoppingList(shoppingList.filter((product) => product.id !== id));
+  };
+
+  const toggleBought = (id) => {
+    setShoppingList(
+      shoppingList.map((product) =>
+        product.id === id ? { ...product, bought: !product.bought } : product
+      )
+    );
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="addProduct">
+        <input
+          value={newProduct}
+          onChange={handleChange}
+          placeholder="Dodaj produkt..."
+        />
+        <button onClick={addProduct}>Dodaj produkt</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className="list">
+        {shoppingList.map((product) => (
+          <Product
+            key={product.id}
+            productName={product.productName}
+            id={product.id}
+            deleteProduct={deleteProduct}
+            toggleBought={toggleBought}
+            bought={product.bought}
+          />
+        ))}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
